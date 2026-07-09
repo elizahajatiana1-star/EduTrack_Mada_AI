@@ -1,0 +1,313 @@
+/* ==========================================================================
+   style.css - Thème Glassmorphism Sombre & Néon (EduTrack Madagascar AI)
+   ========================================================================== */
+
+:root {
+    --bg-dark: #0f0c1b;
+    --primary-gradient: linear-gradient(135deg, #ff007f, #6c5ce7);
+    --text-light: #ffffff;
+    --text-muted: #a29bfe;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --input-bg: rgba(255, 255, 255, 0.07);
+    
+    /* Couleurs de Risque Néon */
+    --risk-high: #ff7675;
+    --risk-watch: #ffeaa7;
+    --risk-stable: #55efc4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #0f0c1b !important;
+    
+    /* Le filtre sombre + l'image de fond éducative/technologique */
+    background-image: linear-gradient(rgba(15, 12, 27, 0.78), rgba(15, 12, 27, 0.88)), 
+                      url('fondprojet.PNG') !important;
+                      
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Barre de Navigation Flottante --- */
+header {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.2rem 2rem;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #ffffff, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* --- Conteneur Principal --- */
+main {
+    max-width: 1200px;
+    width: 100%;
+    margin: 2.5rem auto;
+    padding: 0 2rem;
+    flex: 1;
+}
+
+h2 {
+    margin-bottom: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+/* --- Cartes KPI (Vue synthétique) --- */
+.dashboard-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.kpi-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: #6c5ce7;
+    border-radius: 16px 16px 0 0;
+}
+.kpi-card.risk::before { background: var(--risk-high); }
+.kpi-card.watch::before { background: var(--risk-watch); }
+.kpi-card.stable::before { background: var(--risk-stable); }
+
+.kpi-card h3 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.kpi-card .value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+/* --- Blocs Contenus et Formulaires --- */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media(min-width: 900px) {
+    .content-grid { grid-template-columns: 1fr 2fr; }
+}
+
+.card, .glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.card h3 {
+    margin-bottom: 1.2rem;
+    font-size: 1.2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--input-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group select option {
+    background-color: #171426;
+    color: white;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #ff007f;
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Bouton Gradient --- */
+/* --- Bouton Gradient Vibrant (Version sécurisée pour corriger le bug) --- */
+.btn-gradient {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary-gradient) !important; /* Force l'application du dégradé rose/mauve */
+    border: none !important;                         /* Supprime la bordure grise moche du navigateur */
+    border-radius: 12px;
+    color: #ffffff !important;                      /* Force le texte en blanc */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 0, 127, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+    -webkit-appearance: none;                       /* Supprime les styles par défaut sur Safari/Chrome */
+    appearance: none;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 0, 127, 0.5);
+}
+
+.btn-gradient:active {
+    transform: translateY(0);
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 0, 127, 0.4);
+}
+
+/* --- Tableaux Style Verre --- */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 1.1rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+th {
+    background-color: rgba(108, 92, 231, 0.08);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+tr:hover td {
+    background: rgba(255,255,255,0.02);
+}
+
+/* Badges de Risque Lumineux */
+.badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+.badge.danger { background-color: rgba(255, 118, 117, 0.15); color: #ff7675; border: 1px solid rgba(255, 118, 117, 0.3); }
+.badge.warning { background-color: rgba(255, 234, 167, 0.15); color: #ffeaa7; border: 1px solid rgba(255, 234, 167, 0.3); }
+.badge.success { background-color: rgba(85, 239, 196, 0.15); color: #55efc4; border: 1px solid rgba(85, 239, 196, 0.3); }
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: rgba(0,0,0,0.2);
+    color: rgba(255,255,255,0.3);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--card-border);
+}
+/* --- Thème Clair --- */
+body.light-mode {
+    background-color: #f4f4f8 !important;
+    background-image: linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.92)),
+                      url('fondprojet.PNG') !important;
+    color: #1b1b1f;
+}
+body.light-mode header { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.08); }
+body.light-mode .logo { background: linear-gradient(to right, #1b1b1f, #ff007f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+body.light-mode nav a { color: #5a5a68; }
+body.light-mode nav a:hover, body.light-mode nav a.active { color: #1b1b1f; text-shadow: none; }
+body.light-mode .kpi-card, body.light-mode .card, body.light-mode .glass-card {
+    background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08);
+}
+body.light-mode .form-group input, body.light-mode .form-group select {
+    background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.12); color: #1b1b1f;
+}
+body.light-mode th { background-color: rgba(108,92,231,0.06); color: #6c5ce7; }
+body.light-mode footer { background-color: rgba(0,0,0,0.03); color: rgba(0,0,0,0.4); }
+
+.theme-toggle-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid var(--card-border);
+    color: var(--text-light); width: 40px; height: 40px; border-radius: 50%;
+    font-size: 1.1rem; cursor: pointer;
+}
+body.light-mode .theme-toggle-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #1b1b1f; }
