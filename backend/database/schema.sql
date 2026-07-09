@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     nom_complet     TEXT NOT NULL,
     email           TEXT NOT NULL UNIQUE,
-    mot_de_passe_hash TEXT NOT NULL,
+    mot_de_passe TEXT NOT NULL,
     role            TEXT NOT NULL CHECK (role IN ('enseignant','parent','admin')),
     eleve_id        INTEGER,                              -- renseigné uniquement si role = 'parent'
     FOREIGN KEY (eleve_id) REFERENCES eleves(id) ON DELETE SET NULL

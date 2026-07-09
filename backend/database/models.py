@@ -105,11 +105,12 @@ class Utilisateur(Base):
     __tablename__ = "utilisateurs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nom_utilisateur = Column(String, unique=True, nullable=False)
+    nom_complet = Column(String, unique=True, nullable=False)
+    email= Column(String , unique=True , nullable=False)
     mot_de_passe = Column(String, nullable=False)
     role = Column(String, nullable=False)
     
-    classe_id = Column(Integer, ForeignKey("classes.id"), nullable=True)
+    eleve_id = Column(Integer, ForeignKey("eleve.id"), nullable=True)
     classe = relationship("Classe")
 
     def __repr__(self):
