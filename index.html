@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Madagascar AI - Tableau de bord</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="navbar">
+            <div class="logo">EduTrack <span>Madagascar AI</span></div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Enseignants</a></li>
+                    <li><a href="parent.html">Espace Parents</a></li>
+                    <li><button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀️</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h2>Vue synthétique de l'établissement</h2>
+        
+        <div class="dashboard-summary">
+            <div class="kpi-card">
+                <h3>Élèves Suivis</h3>
+                <div class="value" id="count-total">0</div>
+            </div>
+            <div class="kpi-card risk">
+                <h3>Risque Élevé</h3>
+                <div class="value" id="count-high">0</div>
+            </div>
+            <div class="kpi-card watch">
+                <h3>À Surveiller</h3>
+                <div class="value" id="count-watch">0</div>
+            </div>
+            <div class="kpi-card stable">
+                <h3>Stable</h3>
+                <div class="value" id="count-stable">0</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3>Saisie Suivi Scolaire</h3>
+                <p style="color: var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Ajouter ou mettre à jour un élève</p>
+                
+                <form id="student-form">
+                    <div class="form-group">
+                        <label for="name">Nom complet de l'élève</label>
+                        <input type="text" id="name" required placeholder="Ex: Rova Rakoto">
+                    </div>
+                    <div class="form-group">
+                        <label for="classroom">Classe</label>
+                        <select id="classroom">
+                            <option value="Seconde">Seconde</option>
+                            <option value="Première">Première</option>
+                            <option value="Terminale">Terminale</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                            
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="average">Moyenne Générale (/20)</label>
+                        <input type="number" id="average" min="0" max="20" step="0.1" required placeholder="Ex: 11.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="absences">Nombre d'absences</label>
+                        <input type="number" id="absences" min="0" required placeholder="Ex: 3">
+                    </div>
+                    <button type="submit" class="btn-gradient">Calculer & Enregistrer</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Liste des élèves triée par priorité d'attention</h3>
+                <div class="table-container" style="margin-top: 1rem;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élève</th>
+                                <th>Classe</th>
+                                <th>Moyenne</th>
+                                <th>Absences</th>
+                                <th>Statut de Risque</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 EduTrack Madagascar AI — Projet académique Python / Web</p>
+    </footer>
+
+    <script>
+        // Simulation d'une base de données locale (LocalStorage)
+        let students = JSON.parse(localStorage.getItem('edutrack_students')) || [
+            { id: 1, name: "Tahina Randria", classroom: "Terminale", average: 7.5, absences: 9 },
+            { id: 2, name: "Mialy Soa", classroom: "Première", average: 14.2, absences: 1 },
+            { id: 3, name: "Faly Rasolo", classroom: "Seconde", average: 9.8, absences: 5 }
+        ];
+
+        // Moteur d'analyse basé sur les règles de la Section 5 du cahier des charges
+        function calculateRisk(average, absences) {
+            let points = 0;
+
+            // 5.1 Points liés à la moyenne
+            if (average < 8) points += 3;
+            else if (average >= 8 && average < 10) points += 2;
+            else if (average >= 10 && average < 12) points += 1;
+            
+            // 5.2 Points liés aux absences
+            if (absences >= 8) points += 3;
+            else if (absences >= 4 && absences <= 7) points += 2;
+            else if (absences >= 2 && absences <= 3) points += 1;
+
+            // 5.3 Niveau de risque final
+            if (points >= 4) return { text: "Risque élevé", badge: "danger", score: points };
+            if (points >= 2 && points <= 3) return { text: "À surveiller", badge: "warning", score: points };
+            return { text: "Stable", badge: "success", score: points };
+        }
+
+        function updateUI() {
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+
+            let highCount = 0, watchCount = 0, stableCount = 0;
+
+            // Calcul enrichi des risques
+            const enrichedStudents = students.map(s => {
+                const riskEval = calculateRisk(s.average, s.absences);
+                return { ...s, risk: riskEval };
+            });
+
+            // Tri par priorité d'attention (Moteur d'analyse : Risque Élevé en premier)
+            enrichedStudents.sort((a, b) => b.risk.score - a.risk.score);
+
+            enrichedStudents.forEach(s => {
+                if(s.risk.text === "Risque élevé") highCount++;
+                if(s.risk.text === "À surveiller") watchCount++;
+                if(s.risk.text === "Stable") stableCount++;
+
+                const row = `<tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.classroom}</td>
+                    <td>${s.average}/20</td>
+                    <td>${s.absences} j</td>
+                    <td><span class="badge ${s.risk.badge}">${s.risk.text}</span></td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            // Mise à jour des compteurs globaux
+            document.getElementById('count-total').innerText = students.length;
+            document.getElementById('count-high').innerText = highCount;
+            document.getElementById('count-watch').innerText = watchCount;
+            document.getElementById('count-stable').innerText = stableCount;
+
+            // Sauvegarde locale
+            localStorage.setItem('edutrack_students', JSON.stringify(students));
+        }
+
+        // Formulaire soumis
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const classroom = document.getElementById('classroom').value;
+            const average = parseFloat(document.getElementById('average').value);
+            const absences = parseInt(document.getElementById('absences').value);
+
+            students.push({ id: Date.now(), name, classroom, average, absences });
+            updateUI();
+            this.reset();
+        });
+
+        // Initialisation au chargement de la page
+        updateUI();
+        
+    </script>
+    <script>
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('edutrack_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+if (localStorage.getItem('edutrack_theme') === 'light') {
+    document.addEventListener('DOMContentLoaded', () => document.body.classList.add('light-mode'));
+}
+</script>
+</body>
+</html>
