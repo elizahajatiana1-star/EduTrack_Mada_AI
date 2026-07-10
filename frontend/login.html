@@ -1,169 +1,268 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>EduTrack Madagascar AI - Connexion</title>
+    <style>
+        /* --- Importation et fusion de tes styles de connexion d'origine --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", 'Segoe UI', sans-serif;
+        }
 
-    <link rel="stylesheet" href="style.css">
+        body {
+            min-height: 100vh;
+            background: #fdfbff;
+        }
 
+        .container {
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: wrap; /* Assure la fluidité sur les écrans mobiles */
+        }
+
+        /* --- Partie gauche : Présentation --- */
+        .welcome-section {
+            width: 50%;
+            background: linear-gradient(135deg, #8e44ad, #b8e7ff);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .logo {
+            background: white;
+            color: #8e44ad;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .welcome-section h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .welcome-section p {
+            font-size: 16px;
+            max-width: 400px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .illustration {
+            font-size: 64px;
+            margin-top: 40px;
+        }
+
+        /* --- Partie droite : Formulaire --- */
+        .login-section {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: white;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-box h2 {
+            color: #8e44ad;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #777;
+            margin: 10px 0 30px;
+            font-size: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            outline: none;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: #8e44ad;
+        }
+
+        /* Boîtier mot de passe avec l'icône oeil */
+        .password-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-box span {
+            position: absolute;
+            right: 15px;
+            top: 52%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8e44ad, #a29bfe);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .forgot {
+            text-align: center;
+            margin-top: 20px;
+            color: #8e44ad;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* --- Adaptabilité Mobile (Responsive) --- */
+        @media (max-width: 768px) {
+            .welcome-section, .login-section {
+                width: 100%;
+            }
+            .welcome-section {
+                padding: 40px 20px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
 
     <div class="container">
 
-
-        <!-- Partie gauche : présentation -->
         <div class="welcome-section">
-
-            <div class="logo">
-                🎓 EduTrack
-            </div>
-
-
-            <h1>
-                EduTrack Madagascar AI
-            </h1>
-
-
+            <div class="logo">🎓 EduTrack</div>
+            <h1>EduTrack Madagascar AI</h1>
             <p>
-                La plateforme intelligente de suivi scolaire
-                permettant aux enseignants et parents de suivre
-                la progression des élèves.
+                La plateforme intelligente de suivi scolaire permettant aux enseignants et parents de suivre la progression des élèves.
             </p>
-
-
-            <div class="illustration">
-                📚✨
-            </div>
-
-
+            <div class="illustration">📚✨</div>
         </div>
 
-
-
-        <!-- Partie droite : Login -->
         <div class="login-section">
-
-
             <div class="login-box">
-
-
-                <h2>
-                    Bienvenue 👋
-                </h2>
-
-
-                <p class="subtitle">
-                    Connectez-vous à votre espace
-                </p>
-
-
+                <h2>Bienvenue 👋</h2>
+                <p class="subtitle">Connectez-vous à votre espace</p>
 
                 <form id="loginForm">
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" placeholder="votre.email@mg.com" required>
 
-
-                    <label>
-                        Adresse email
-                    </label>
-
-                    <input 
-                        type="email"
-                        placeholder="exemple@gmail.com"
-                        required
-                    >
-
-
-
-
-                    <label>
-                        Mot de passe
-                    </label>
-
-
+                    <label for="password">Mot de passe</label>
                     <div class="password-box">
-
-                        <input 
-                            type="password"
-                            id="password"
-                            placeholder="Votre mot de passe"
-                            required
-                        >
-
-
-                        <span id="showPassword">
-                            👁
-                        </span>
-
+                        <input type="password" id="password" placeholder="Votre mot de passe" required>
+                        <span id="showPassword">👁</span>
                     </div>
 
-
-
-
-                    <label>
-                        Type de compte
-                    </label>
-
-
-                    <select>
-
-                        <option>
-                            Enseignant
-                        </option>
-
-
-                        <option>
-                            Parent
-                        </option>
-
-
-                        <option>
-                            Administrateur
-                        </option>
-
-
+                    <label for="roleSelect">Type de compte</label>
+                    <select id="roleSelect">
+                        <option value="Enseignant">Enseignant</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Administrateur">Administrateur</option>
                     </select>
 
-
-
-
-                    <button type="submit">
-
-                        Se connecter
-
-                    </button>
-
-
+                    <button type="submit">Se connecter</button>
                 </form>
 
-
-
-                <p class="forgot">
-
-                    Mot de passe oublié ?
-
-                </p>
-
-
-
+                <p class="forgot">Mot de passe oublié ?</p>
             </div>
-
-
         </div>
-
-
 
     </div>
 
+    <script>
+        // --- 1. Gestion de la visibilité du mot de passe ---
+        const passwordInput = document.getElementById("password");
+        const showPasswordBtn = document.getElementById("showPassword");
 
+        if (showPasswordBtn && passwordInput) {
+            showPasswordBtn.addEventListener("click", () => {
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    showPasswordBtn.textContent = "🙈";
+                } else {
+                    passwordInput.type = "password";
+                    showPasswordBtn.textContent = "👁";
+                }
+            });
+        }
 
-<script src="script.js"></script>
+        // --- 2. Interception du formulaire et routage dynamique ---
+        const loginForm = document.getElementById("loginForm");
 
+        if (loginForm) {
+            loginForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                const roleSelect = document.getElementById("roleSelect");
+                const selectedRole = roleSelect.value.toLowerCase().trim(); // "enseignant", "parent", "administrateur"
 
+                // Stockage du rôle pour que l'API applique les bonnes permissions
+                sessionStorage.setItem("user_role", selectedRole);
+                
+                if (selectedRole === "parent") {
+                    // Simulation : Le parent connecté a l'autorisation pour l'élève n°1 dans SQLite
+                    sessionStorage.setItem("eleve_autorise", "1");
+                    alert("Connexion réussie ! Redirection vers votre Espace Parent sécurisé.");
+                    window.location.href = "parent.html";
+                } else if (selectedRole === "administrateur") {
+                    // ✅ Redirection vers admin.html pour l'Administrateur
+                    sessionStorage.removeItem("eleve_autorise");
+                    alert("Connexion réussie ! Redirection vers l'Espace Administration.");
+                    window.location.href = "admin.html";
+                } else {
+                    // Redirection vers index.html pour l'Enseignant
+                    sessionStorage.removeItem("eleve_autorise");
+                    alert("Connexion réussie ! Redirection vers le Tableau de bord Enseignant.");
+                    window.location.href = "index.html";
+                }
+            });
+        }
+    </script>
 </body>
-
 </html>
