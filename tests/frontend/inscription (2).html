@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Madagascar AI - Inscription</title>
+    <style>
+        /* --- Styles Néon / Thème Sombre d'origine --- */
+        :root {
+            --bg-dark: #0f0c1b;
+            --primary-gradient: linear-gradient(135deg, #ff007f, #6c5ce7);
+            --text-light: #ffffff;
+            --text-muted: #a29bfe;
+            --input-bg: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 127, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(0, 206, 201, 0.12) 0%, transparent 35%);
+            background-attachment: fixed;
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            flex-wrap: wrap;
+        }
+
+        /* --- Partie gauche : Présentation --- */
+        .welcome-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            text-align: center;
+            border-right: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-section p {
+            font-size: 16px;
+            max-width: 420px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .illustration {
+            font-size: 64px;
+            margin-top: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* --- Partie droite : Formulaire --- */
+        .register-section {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .register-box {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+        }
+
+        .register-box h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: var(--input-bg);
+            color: var(--text-light);
+            outline: none;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff007f;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+        }
+
+        select option {
+            background-color: #0f0c1b;
+            color: var(--text-light);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .login-link a {
+            color: #ff007f;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* --- Alertes et Notifications --- */
+        .alert-box {
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+        }
+        .alert-error {
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid #ff007f;
+            color: #ff007f;
+        }
+        .alert-success {
+            background: rgba(0, 206, 201, 0.15);
+            border: 1px solid #00cec9;
+            color: #00cec9;
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 850px) {
+            .welcome-section, .register-section {
+                width: 100%;
+            }
+            .welcome-section {
+                padding: 40px 20px;
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="welcome-section">
+            <div class="logo">EduTrack AI</div>
+            <h1>Rejoignez l'aventure</h1>
+            <p>
+                Créez votre compte pour commencer à monitorer en temps réel le risque de décrochage scolaire et assurer la réussite des élèves.
+            </p>
+            <div class="illustration">📝✨</div>
+        </div>
+
+        <div class="register-section">
+            <div class="register-box">
+                <h2>Créer un compte</h2>
+                <p class="subtitle">Accédez aux outils d'analyse prédictive</p>
+
+                <form id="registerForm">
+                    <label for="fullname">Nom complet</label>
+                    <input type="text" id="fullname" placeholder="Ex: Jean Dupont" required>
+
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" placeholder="votre.email@mg.com" required>
+
+                    <label for="role">Type de compte</label>
+                    <select id="role">
+                        <option value="Enseignant">Enseignant</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Administrateur">Administrateur</option>
+                    </select>
+
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="Minimum 6 caractères" required>
+
+                    <label for="password-confirm">Confirmer le mot de passe</label>
+                    <input type="password" id="password-confirm" placeholder="Répétez votre mot de passe" required>
+
+                    <div id="error-box" class="alert-box alert-error"></div>
+                    <div id="success-box" class="alert-box alert-success"></div>
+
+                    <button type="submit">S'inscrire</button>
+                </form>
+
+                <p class="login-link">Déjà inscrit ? <a href="login.html">Se connecter</a></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+            const role = document.getElementById('role').value;
+
+            const errorBox = document.getElementById('error-box');
+            const successBox = document.getElementById('success-box');
+            
+            errorBox.style.display = "none";
+            successBox.style.display = "none";
+
+            // Validation des mots de passe
+            if (password !== passwordConfirm) {
+                errorBox.innerText = "Les mots de passe ne correspondent pas.";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            // Simulation d'enregistrement local
+            let users = JSON.parse(localStorage.getItem('edutrack_users')) || [];
+            const emailExists = users.some(u => u.email === email) || ["prof@mg.com", "parent@mg.com"].includes(email);
+
+            if (emailExists) {
+                errorBox.innerText = "Un compte existe déjà avec cet email.";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            // Sauvegarde de l'utilisateur fictif
+            users.push({ fullname, email, password, role });
+            localStorage.setItem('edutrack_users', JSON.stringify(users));
+
+            successBox.innerText = "Compte créé avec succès ! Redirection...";
+            successBox.style.display = "block";
+
+            // Redirection vers le login
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Madagascar AI - Espace Parents</title>
+    <style>
+        :root {
+            --bg-dark: #0f0c1b;
+            --primary-gradient: linear-gradient(135deg, #ff007f, #6c5ce7);
+            --text-light: #ffffff;
+            --text-muted: #a29bfe;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.07);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; }
+        header { background: rgba(15, 12, 27, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 100; }
+        .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+        .logo { font-size: 24px; font-weight: 800; }
+        .logo span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        nav a.active { color: var(--text-light); }
+        
+        main { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .search-box input { flex: 1; padding: 15px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .btn { padding: 15px 25px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        
+        .bulletin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 25px; display: none; }
+        .bulletin-header { border-bottom: 1px solid var(--card-border); padding-bottom: 15px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--card-border); }
+        
+        .ia-warning-box { margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255, 118, 117, 0.1); border: 1px solid rgba(255, 118, 117, 0.3); color: #ff7675; display: none; }
+        .moyenne-generale { font-size: 20px; font-weight: bold; margin-top: 25px; text-align: right; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">EduTrack <span>Madagascar AI</span></div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Enseignants</a></li>
+                    <li><a href="parent.html" class="active">Parents</a></li>
+                    <li><a href="admin.html">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <h2 style="margin-bottom: 20px;">Suivi de Scolarité Élève</h2>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Entrez le prénom ou le nom de votre enfant...">
+            <button class="btn" onclick="rechercherEnfant()">Rechercher</button>
+        </div>
+
+        <div class="bulletin-card" id="bulletin-zone">
+            <div class="bulletin-header">
+                <h3 id="enfant-nom">Nom de l'enfant</h3>
+                <p id="enfant-classe" style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Classe</p>
+            </div>
+            
+            <div class="ia-warning-box" id="parent-ia-warning"></div>
+
+            <h4 style="margin-top: 20px;">📊 Notes obtenues (Trimestre 3)</h4>
+            <table>
+                <thead>
+                    <tr><th>Matière</th><th>Note / 20</th><th>Date de l'évaluation</th></tr>
+                </thead>
+                <tbody id="notes-table-body"></tbody>
+            </table>
+            <div class="moyenne-generale" id="enfant-moyenne">Moyenne Générale : -- / 20</div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000/api";
+
+        async function rechercherEnfant() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const bulletinZone = document.getElementById('bulletin-zone');
+            const warningBox = document.getElementById('parent-ia-warning');
+            
+            if (!query) return alert("Veuillez saisir un nom ou prénom !");
+
+            try {
+                const res = await fetch(`${API_URL}/eleves`);
+                const eleves = await res.json();
+
+                const enfant = eleves.find(e => 
+                    e.prenom.toLowerCase().includes(query) || 
+                    e.nom.toLowerCase().includes(query)
+                );
+
+                if (!enfant) {
+                    bulletinZone.style.display = "none";
+                    return alert("Élève non trouvé.");
+                }
+
+                // Charger le score de risque IA en temps réel
+                const resScore = await fetch(`${API_URL}/eleves/${enfant.id}/score`);
+                const scoreData = await resScore.json();
+
+                // Afficher le message d'alerte s'il y a un risque détecté par l'IA
+                if (scoreData.niveau_risque !== "stable") {
+                    warningBox.innerHTML = `🚨 **Notification IA Prévention :** Des fragilités académiques ont été détectées. Prenez contact avec l'équipe pédagogique pour mettre en œuvre un accompagnement à la maison.`;
+                    warningBox.style.display = "block";
+                } else {
+                    warningBox.style.display = "none";
+                }
+
+                // Charger les notes
+                const resNotes = await fetch(`${API_URL}/eleves/${enfant.id}/notes`);
+                const notes = await resNotes.json();
+
+                document.getElementById('enfant-nom').innerText = `🏆 ${enfant.prenom} ${enfant.nom}`;
+                document.getElementById('enfant-classe').innerText = `📍 Classe ID : ${enfant.classe_id}`;
+
+                const tbody = document.getElementById('notes-table-body');
+                tbody.innerHTML = "";
+
+                if (notes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Aucune note enregistrée.</td></tr>`;
+                    document.getElementById('enfant-moyenne').innerText = "Moyenne Générale : --";
+                } else {
+                    let somme = 0;
+                    notes.forEach(n => {
+                        somme += n.valeur;
+                        let matiereNom = n.matiere_id === 1 ? "Mathématiques" : "Français";
+                        tbody.innerHTML += `<tr><td><strong>${matiereNom}</strong></td><td>${n.valeur} / 20</td><td>${n.date_evaluation}</td></tr>`;
+                    });
+                    document.getElementById('enfant-moyenne').innerText = `Moyenne Générale : ${(somme / notes.length).toFixed(2)} / 20`;
+                }
+
+                bulletinZone.style.display = "block";
+            } catch (err) { console.error(err); }
+        }
+    </script>
+</body>
+</html>
