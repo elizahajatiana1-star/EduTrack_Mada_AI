@@ -1,217 +1,222 @@
-"""
-app.py — API EduTrack Madagascar AI (Personne 2 : Backend/API)
-------------------------------------------------------------------
-Framework : FastAPI (choisi car requirements.txt de la Personne 1
-le prévoyait déjà, et parce qu'il génère la doc interactive tout seul
-sur /docs).
-
-Pour lancer l'API en local :
-    uvicorn app:app --reload
-
-Puis ouvrir : http://127.0.0.1:8000/docs (doc interactive Swagger)
-"""
-
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session as SQLASession
-from sqlalchemy import func
-from typing import List
+from pydantic import BaseModel
+from typing import List, Optional
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+from datetime import datetime
 
-from models import Session, Eleve, Note, Absence, Alerte, Recommandation, Classe
-import schemas
-from scoring_stub import calculer_score, generer_recommandations
-# Quand la Personne 3 livre son fichier, remplace la ligne au-dessus par :
-# from scoring import calculer_score, generer_recommandations
+# --- CONFIGURATION BASE DE DONNÉES ---
+DATABASE_URL = "sqlite:///./edutrack.db"
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-app = FastAPI(
-    title="EduTrack Madagascar AI — API",
-    description="API de suivi scolaire (élèves, notes, absences, alertes)",
-    version="0.1.0",
-)
+# --- MODÈLES ORM SQLALCHEMY ---
+class Classe(Base):
+    __tablename__ = "classes"
+    id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String, nullable=False)
+    niveau = Column(String, nullable=False)
+    # ✅ FIXATION : Alignement strict sur ton fichier .db existant (un seul 'e')
+    anne_scolaire = Column(String, nullable=True)
 
-# Permet à l'interface (Personne 4), servie sur un autre port, d'appeler l'API
+class Eleve(Base):
+    __tablename__ = "eleves"
+    id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String, nullable=False)
+    prenom = Column(String, nullable=False)
+    classe_id = Column(Integer, ForeignKey("classes.id"), nullable=False)
+    date_naissance = Column(String, nullable=True)
+    contact_parent = Column(String, nullable=True)
+
+class Note(Base):
+    __tablename__ = "notes"
+    id = Column(Integer, primary_key=True, index=True)
+    eleve_id = Column(Integer, ForeignKey("eleves.id"), nullable=False)
+    matiere_id = Column(Integer, nullable=False)  # 1 = Mathématiques, 2 = Français
+    valeur = Column(Float, nullable=False)
+    date_evaluation = Column(String, nullable=False)
+    trimestre = Column(Integer, nullable=False)
+
+class Absence(Base):
+    __tablename__ = "absences"
+    id = Column(Integer, primary_key=True, index=True)
+    eleve_id = Column(Integer, ForeignKey("eleves.id"), nullable=False)
+    date_absence = Column(String, nullable=False)
+    justifie = Column(Integer, default=0)
+
+class Alerte(Base):
+    __tablename__ = "alertes"
+    id = Column(Integer, primary_key=True, index=True)
+    eleve_id = Column(Integer, ForeignKey("eleves.id"), nullable=False)
+    score = Column(Integer, nullable=False)
+    niveau_risque = Column(String, nullable=False)
+    motif = Column(String, nullable=False)
+    date_creation = Column(String, nullable=False)
+
+# Création des tables manquantes si nécessaire (sans écraser l'existant)
+Base.metadata.create_all(bind=engine)
+
+# --- APPLICATIONS FASTAPI & CORS ---
+app = FastAPI(title="EduTrack Madagascar AI API")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # à restreindre en production
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# ------------------------------------------------------------------
-# Dépendance : une session de BDD par requête
-# ------------------------------------------------------------------
+# Dépendance de session BDD
 def get_db():
-    db = Session()
+    db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
+# --- SCHÉMAS PYDANTIC (VALIDATION DES DONNÉES COUCHE WEB) ---
+class EleveCreate(BaseModel):
+    nom: str
+    prenom: str
+    classe_id: int
+    date_naissance: Optional[str] = None
+    contact_parent: Optional[str] = None
 
-# ------------------------------------------------------------------
-# Sécurité simplifiée (Étape 4 - optionnelle)
-# ------------------------------------------------------------------
-# Démo simple : le "rôle" et l'"eleve_id autorisé" sont passés en en-têtes
-# HTTP par l'interface. Un vrai système utiliserait des tokens JWT liés
-# à la table `utilisateurs`, mais son schéma diffère encore de models.py
-# (voir README, section "Point d'attention") donc on reste simple ici.
-def role_actuel(x_role: str = "enseignant", x_eleve_autorise: int | None = None):
-    return {"role": x_role, "eleve_autorise": x_eleve_autorise}
+class NoteCreate(BaseModel):
+    eleve_id: int
+    matiere_id: int
+    valeur: float
+    date_evaluation: str
+    trimestre: int
 
+# --- API ENDPOINTS ---
 
-def verifier_acces_eleve(eleve_id: int, auth=Depends(role_actuel)):
-    if auth["role"] == "parent" and auth["eleve_autorise"] != eleve_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Un parent ne peut consulter que la fiche de son propre enfant",
-        )
-    return auth
-
-
-# ------------------------------------------------------------------
-# Utilitaire : récupérer un élève ou lever une 404 propre
-# ------------------------------------------------------------------
-def get_eleve_ou_404(db: SQLASession, eleve_id: int) -> Eleve:
-    eleve = db.query(Eleve).filter(Eleve.id == eleve_id).first()
-    if eleve is None:
-        raise HTTPException(status_code=404, detail="Élève non trouvé")
-    return eleve
-
-
-# ==================================================================
-# CRUD ELEVES
-# ==================================================================
-@app.get("/api/eleves", response_model=List[schemas.EleveOut])
-def lister_eleves(db: SQLASession = Depends(get_db)):
+# 1. Obtenir tous les élèves
+@app.get("/api/eleves")
+def obtenir_eleves(db: Session = Depends(get_db)):
     return db.query(Eleve).all()
 
-
-@app.get("/api/eleves/{eleve_id}", response_model=schemas.EleveOut)
-def obtenir_eleve(eleve_id: int, db: SQLASession = Depends(get_db)):
-    return get_eleve_ou_404(db, eleve_id)
-
-
-@app.post("/api/eleves", response_model=schemas.EleveOut, status_code=201)
-def creer_eleve(payload: schemas.EleveCreate, db: SQLASession = Depends(get_db)):
-    classe = db.query(Classe).filter(Classe.id == payload.classe_id).first()
-    if classe is None:
-        raise HTTPException(status_code=400, detail="classe_id invalide : cette classe n'existe pas")
-
-    eleve = Eleve(**payload.model_dump())
-    db.add(eleve)
-    db.commit()
-    db.refresh(eleve)
-    return eleve
-
-
-@app.put("/api/eleves/{eleve_id}", response_model=schemas.EleveOut)
-def modifier_eleve(eleve_id: int, payload: schemas.EleveUpdate, db: SQLASession = Depends(get_db)):
-    eleve = get_eleve_ou_404(db, eleve_id)
-    donnees = payload.model_dump(exclude_unset=True)
-    for champ, valeur in donnees.items():
-        setattr(eleve, champ, valeur)
-    db.commit()
-    db.refresh(eleve)
-    return eleve
-
-
-@app.delete("/api/eleves/{eleve_id}", status_code=204)
-def supprimer_eleve(eleve_id: int, db: SQLASession = Depends(get_db)):
-    eleve = get_eleve_ou_404(db, eleve_id)
-    db.delete(eleve)
-    db.commit()
-    return None
-
-
-# ==================================================================
-# NOTES
-# ==================================================================
-@app.post("/api/notes", response_model=schemas.NoteOut, status_code=201)
-def ajouter_note(payload: schemas.NoteCreate, db: SQLASession = Depends(get_db)):
-    get_eleve_ou_404(db, payload.eleve_id)  # vérifie que l'élève existe
-    # payload.valeur est déjà validé entre 0 et 20 par schemas.NoteCreate (Field ge=0, le=20)
-    note = Note(**payload.model_dump())
-    db.add(note)
-    db.commit()
-    db.refresh(note)
-    return note
-
-
-# ==================================================================
-# ABSENCES
-# ==================================================================
-@app.post("/api/absences", response_model=schemas.AbsenceOut, status_code=201)
-def ajouter_absence(payload: schemas.AbsenceCreate, db: SQLASession = Depends(get_db)):
-    get_eleve_ou_404(db, payload.eleve_id)
-    absence = Absence(
-        eleve_id=payload.eleve_id,
-        date_absence=payload.date_absence,
-        justifiee=1 if payload.justifiee else 0,
-        motif=payload.motif,
+# 2. Ajouter un élève
+@app.post("/api/eleves")
+def ajouter_eleve(eleve: EleveCreate, db: Session = Depends(get_db)):
+    db_eleve = Eleve(
+        nom=eleve.nom,
+        prenom=eleve.prenom,
+        classe_id=eleve.classe_id,
+        date_naissance=eleve.date_naissance,
+        contact_parent=eleve.contact_parent
     )
-    db.add(absence)
+    db.add(db_eleve)
     db.commit()
-    db.refresh(absence)
-    # on reconvertit 0/1 en booléen pour respecter AbsenceOut
-    return schemas.AbsenceOut(
-        id=absence.id,
-        eleve_id=absence.eleve_id,
-        date_absence=absence.date_absence,
-        justifiee=bool(absence.justifiee),
-        motif=absence.motif,
+    db.refresh(db_eleve)
+    return db_eleve
+
+# 3. Supprimer un élève
+@app.delete("/api/eleves/{eleve_id}")
+def supprimer_eleve(eleve_id: int, db: Session = Depends(get_db)):
+    db_eleve = db.query(Eleve).filter(Eleve.id == eleve_id).first()
+    if not db_eleve:
+        raise HTTPException(status_code=404, detail="Élève non trouvé")
+    
+    # Nettoyer les notes, absences et alertes liées à cet élève avant suppression
+    db.query(Note).filter(Note.eleve_id == eleve_id).delete()
+    db.query(Absence).filter(Absence.eleve_id == eleve_id).delete()
+    db.query(Alerte).filter(Alerte.eleve_id == eleve_id).delete()
+    
+    db.delete(db_eleve)
+    db.commit()
+    return {"message": "Élève supprimé avec succès"}
+
+# 4. Obtenir les notes d'un élève spécifique
+@app.get("/api/eleves/{eleve_id}/notes")
+def obtenir_notes_eleve(eleve_id: int, db: Session = Depends(get_db)):
+    return db.query(Note).filter(Note.eleve_id == eleve_id).all()
+
+# 5. Obtenir les absences d'un élève spécifique
+@app.get("/api/eleves/{eleve_id}/absences")
+def obtenir_absences_eleve(eleve_id: int, db: Session = Depends(get_db)):
+    return db.query(Absence).filter(Absence.eleve_id == eleve_id).all()
+
+# 6. Ajouter une note
+@app.post("/api/notes")
+def ajouter_note(note: NoteCreate, db: Session = Depends(get_db)):
+    db_note = Note(
+        eleve_id=note.eleve_id,
+        matiere_id=note.matiere_id,
+        valeur=note.valeur,
+        date_evaluation=note.date_evaluation,
+        trimestre=note.trimestre
     )
+    db.add(db_note)
+    db.commit()
+    db.refresh(db_note)
+    return db_note
 
+# 7. Obtenir toutes les alertes de l'IA active
+@app.get("/api/alertes")
+def obtenir_alertes(db: Session = Depends(get_db)):
+    return db.query(Alerte).all()
 
-# ==================================================================
-# SCORING (intégration avec la Personne 3)
-# ==================================================================
-@app.get("/api/eleves/{eleve_id}/score", response_model=schemas.ScoreOut)
-def obtenir_score(eleve_id: int, db: SQLASession = Depends(get_db), auth=Depends(verifier_acces_eleve)):
-    eleve = get_eleve_ou_404(db, eleve_id)
+# 8. MOTEUR IA : Calcul prédictif automatique du score de risque
+@app.get("/api/eleves/{eleve_id}/score")
+def calculer_score_ia(eleve_id: int, db: Session = Depends(get_db)):
+    notes = db.query(Note).filter(Note.eleve_id == eleve_id).all()
+    absences = db.query(Absence).filter(Absence.eleve_id == eleve_id).all()
+    
+    score = 0
+    motifs = []
+    
+    # Règle d'alerte IA 1 : Moyenne globale insuffisante
+    if notes:
+        moyenne = sum([n.valeur for n in notes]) / len(notes)
+        if moyenne < 10:
+            score += 3
+            motifs.append(f"Moyenne générale critique : {moyenne:.2f}/20")
+    else:
+        moyenne = 10.0  # Par défaut stable si pas encore de notes
+        
+    # Règle d'alerte IA 2 : Mauvaise note ciblée par matière
+    for n in notes:
+        if n.valeur < 8.0:
+            score += 1
+            nom_mat = "Mathématiques" if n.matiere_id == 1 else "Français"
+            motifs.append(f"Note alarmante en {nom_mat} ({n.valeur}/20)")
+            
+    # Règle d'alerte IA 3 : Absentéisme non justifié
+    abs_non_justifiees = len([a for a in absences if a.justifie == 0])
+    if abs_non_justifiees > 2:
+        score += 2
+        motifs.append(f"Décrochage : {abs_non_justifiees} absences injustifiées")
 
-    notes = [n.valeur for n in eleve.notes]
-    nb_absences_non_justifiees = sum(1 for a in eleve.absences if not a.justifiee)
+    # Détermination du niveau de risque final
+    niveau_risque = "stable"
+    if score >= 4:
+        niveau_risque = "risque_eleve"
+    elif score >= 2:
+        niveau_risque = "a_surveiller"
 
-    resultat = calculer_score(notes, nb_absences_non_justifiees)
-
-    # On enregistre l'alerte en BDD si le niveau de risque n'est pas "stable"
-    if resultat["niveau_risque"] != "stable":
-        alerte = Alerte(
-            eleve_id=eleve_id,
-            niveau_risque=resultat["niveau_risque"],
-            score=resultat["score"],
-            motif=resultat["motif"],
-            statut="ouverte",
-        )
-        db.add(alerte)
+    # Enregistrement ou mise à jour automatique de l'alerte calculée dans SQLite
+    if score > 0:
+        db_alerte = db.query(Alerte).filter(Alerte.eleve_id == eleve_id).first()
+        motif_final = " | ".join(motifs)
+        if db_alerte:
+            db_alerte.score = score
+            db_alerte.niveau_risque = niveau_risque
+            db_alerte.motif = motif_final
+            db_alerte.date_creation = datetime.now().strftime("%Y-%m-%d")
+        else:
+            db_alerte = Alerte(
+                eleve_id=eleve_id,
+                score=score,
+                niveau_risque=niveau_risque,
+                motif=motif_final,
+                date_creation=datetime.now().strftime("%Y-%m-%d")
+            )
+            db.add(db_alerte)
         db.commit()
 
-    return schemas.ScoreOut(eleve_id=eleve_id, **resultat)
-
-
-@app.get("/api/alertes", response_model=List[schemas.AlerteOut])
-def lister_alertes(db: SQLASession = Depends(get_db)):
-    return (
-        db.query(Alerte)
-        .filter(Alerte.statut == "ouverte")
-        .order_by(Alerte.score.desc())
-        .all()
-    )
-
-
-@app.get("/api/eleves/{eleve_id}/recommandations", response_model=List[str])
-def obtenir_recommandations(eleve_id: int, db: SQLASession = Depends(get_db)):
-    eleve = get_eleve_ou_404(db, eleve_id)
-    notes = [n.valeur for n in eleve.notes]
-    nb_absences_non_justifiees = sum(1 for a in eleve.absences if not a.justifiee)
-    resultat = calculer_score(notes, nb_absences_non_justifiees)
-    return generer_recommandations(resultat)
-
-
-# ==================================================================
-# Racine (pratique pour vérifier que l'API tourne)
-# ==================================================================
-@app.get("/")
-def racine():
-    return {"message": "API EduTrack en ligne. Voir /docs pour la documentation interactive."}
+    return {"eleve_id": eleve_id, "score": score, "niveau_risque": niveau_risque, "moyenne": moyenne}
