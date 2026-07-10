@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduTrack Madagascar AI - Espace Parents</title>
     <style>
-        /* --- Importation exacte du thème Néon/Glassmorphism --- */
         :root {
             --bg-dark: #0f0c1b;
             --primary-gradient: linear-gradient(135deg, #ff007f, #6c5ce7);
@@ -13,343 +12,133 @@
             --text-muted: #a29bfe;
             --card-bg: rgba(255, 255, 255, 0.04);
             --card-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.07);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 80% 20%, rgba(255, 0, 127, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 10% 80%, rgba(0, 206, 201, 0.08) 0%, transparent 45%);
-                    background-image: linear-gradient(rgba(15, 12, 27, 0.78), rgba(15, 12, 27, 0.88)), 
-                      url('fondprojet.PNG') !important;
-            background-attachment: fixed;
-            color: var(--text-light);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--card-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.2rem 2rem;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: bold;
-            background: linear-gradient(to right, #ffffff, #6c5ce7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo span {
-            font-size: 0.75rem;
-            background: rgba(108, 92, 231, 0.15);
-            border: 1px solid rgba(108, 92, 231, 0.3);
-            color: #a29bfe;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        nav a:hover, nav a.active {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        main {
-            max-width: 1200px;
-            width: 100%;
-            margin: 2.5rem auto;
-            padding: 0 2rem;
-            flex: 1;
-        }
-
-        h2 { margin-bottom: 2rem; }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            padding: 2rem 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .form-group select {
-            width: 100%;
-            padding: 0.9rem 1rem;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            font-size: 1rem;
-            color: var(--text-light);
-            outline: none;
-        }
-
-        .form-group select option { background: #171426; }
-
-        /* --- Blocs d'Affichage Internes --- */
-        .dashboard-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .kpi-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 16px;
-        }
-
-        .kpi-card h3 {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .kpi-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
-        }
-
-        /* --- Spécificités Moteur IA Élégant --- */
-        .ia-box {
-            border: 1px solid rgba(108, 92, 231, 0.25);
-            background: linear-gradient(145deg, rgba(255,255,255,0.02), rgba(108, 92, 231, 0.05));
-            padding: 1.5rem;
-            border-radius: 14px;
-            margin-top: 1rem;
-        }
-
-        .ia-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            color: #a29bfe;
-            font-weight: 600;
-        }
-
-        .recommendation-box {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 1.2rem;
-            border-left: 4px solid #6c5ce7;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            background-color: rgba(0,0,0,0.2);
-            color: rgba(255,255,255,0.3);
-            font-size: 0.85rem;
-            margin-top: 3rem;
-            border-top: 1px solid var(--card-border);
-        }
-        /* --- Thème Clair --- */
-body.light-mode {
-    background-color: #f4f4f8 !important;
-    background-image: linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.92)),
-                      url('fondprojet.PNG') !important;
-    color: #1b1b1f;
-}
-body.light-mode header { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.08); }
-body.light-mode .logo { background: linear-gradient(to right, #1b1b1f, #ff007f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-body.light-mode nav a { color: #5a5a68; }
-body.light-mode nav a:hover, body.light-mode nav a.active { color: #1b1b1f; text-shadow: none; }
-body.light-mode .kpi-card, body.light-mode .card, body.light-mode .glass-card {
-    background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08);
-}
-body.light-mode .form-group input, body.light-mode .form-group select {
-    background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.12); color: #1b1b1f;
-}
-body.light-mode th { background-color: rgba(108,92,231,0.06); color: #6c5ce7; }
-body.light-mode footer { background-color: rgba(0,0,0,0.03); color: rgba(0,0,0,0.4); }
-
-.theme-toggle-btn {
-    background: rgba(255,255,255,0.08); border: 1px solid var(--card-border);
-    color: var(--text-light); width: 40px; height: 40px; border-radius: 50%;
-    font-size: 1.1rem; cursor: pointer;
-}
-body.light-mode .theme-toggle-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #1b1b1f; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; }
+        header { background: rgba(15, 12, 27, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 100; }
+        .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+        .logo { font-size: 24px; font-weight: 800; }
+        .logo span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        nav a.active { color: var(--text-light); }
+        
+        main { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .search-box input { flex: 1; padding: 15px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .btn { padding: 15px 25px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        
+        .bulletin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 25px; display: none; }
+        .bulletin-header { border-bottom: 1px solid var(--card-border); padding-bottom: 15px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--card-border); }
+        
+        .ia-warning-box { margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255, 118, 117, 0.1); border: 1px solid rgba(255, 118, 117, 0.3); color: #ff7675; display: none; }
+        .moyenne-generale { font-size: 20px; font-weight: bold; margin-top: 25px; text-align: right; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
-
     <header>
         <div class="navbar">
-            <div class="logo">EduTrack <span>Espace Parents</span></div>
+            <div class="logo">EduTrack <span>Madagascar AI</span></div>
             <nav>
                 <ul>
                     <li><a href="index.html">Enseignants</a></li>
-                    <li><a href="parent.html" class="active">Espace Parents</a></li>
-                    <li><a href="login.html" style="color: #ff007f;">Déconnexion</a></li>
-                    <li><button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">☀️</button></li>
+                    <li><a href="parent.html" class="active">Parents</a></li>
+                    <li><a href="admin.html">Admin</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-
     <main>
-        <h2>Recherche du suivi de votre enfant</h2>
-        
-        <div class="content-grid">
-            <div class="card">
-                <div class="form-group" style="max-width: 400px;">
-                    <label for="select-student">Nom de l'élève :</label>
-                    <select id="select-student" onchange="loadParentView()"></select>
-                </div>
-            </div>
+        <h2 style="margin-bottom: 20px;">Suivi de Scolarité Élève</h2>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Entrez le prénom ou le nom de votre enfant...">
+            <button class="btn" onclick="rechercherEnfant()">Rechercher</button>
+        </div>
 
-            <div class="card" id="parent-report-card" style="display:none; border-top: 3px solid #ff007f;">
-                <h3 id="display-name" style="font-size: 1.4rem;">Fiche élève</h3>
-                
-                <div class="dashboard-summary">
-                    <div class="kpi-card">
-                        <h3>Moyenne Trimestrielle</h3>
-                        <div class="value" id="parent-avg">0/20</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h3>Absences Enregistrées</h3>
-                        <div class="value" id="parent-abs">0</div>
-                    </div>
-                    <div class="kpi-card" id="parent-risk-card" style="transition: background 0.5s;">
-                        <h3>Niveau de Risque</h3>
-                        <div class="value" id="parent-risk-status" style="font-size: 1.6rem; text-shadow: 0 0 10px rgba(0,0,0,0.4);">Stable</div>
-                    </div>
-                </div>
-
-                <div class="ia-box">
-                    <div class="ia-header">
-                        <span>✨</span> Analyse & Actions de l'IA Pédagogique
-                    </div>
-                    <div id="recommendation-content" class="recommendation-box"></div>
-                </div>
+        <div class="bulletin-card" id="bulletin-zone">
+            <div class="bulletin-header">
+                <h3 id="enfant-nom">Nom de l'enfant</h3>
+                <p id="enfant-classe" style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Classe</p>
             </div>
+            
+            <div class="ia-warning-box" id="parent-ia-warning"></div>
+
+            <h4 style="margin-top: 20px;">📊 Notes obtenues (Trimestre 3)</h4>
+            <table>
+                <thead>
+                    <tr><th>Matière</th><th>Note / 20</th><th>Date de l'évaluation</th></tr>
+                </thead>
+                <tbody id="notes-table-body"></tbody>
+            </table>
+            <div class="moyenne-generale" id="enfant-moyenne">Moyenne Générale : -- / 20</div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2026 EduTrack Madagascar AI — Suivi transparent parents-enseignants</p>
-    </footer>
-
     <script>
-        let students = JSON.parse(localStorage.getItem('edutrack_students')) || [];
+        const API_URL = "http://127.0.0.1:8000/api";
 
-        function initDropdown() {
-            const select = document.getElementById('select-student');
-            select.innerHTML = '<option value="">-- Choisir un élève --</option>';
-            students.forEach(s => {
-                select.innerHTML += `<option value="${s.id}">${s.name} (${s.classroom})</option>`;
-            });
-        }
-
-        function generateRecommendations(average, absences) {
-            let actions = [];
-            if (average < 10) actions.push("<strong>Soutien scolaire requis :</strong> Prévoir des sessions de révision ciblées.");
-            else if (average < 12) actions.push("<strong>Approfondissement conseillé :</strong> Consolider les acquis par des exercices à la maison.");
-
-            if (absences >= 4) actions.push("<strong>Alerte Absentéisme :</strong> Contact urgent requis avec l'établissement.");
-            else if (absences >= 2) actions.push("<strong>Suivi régulier :</strong> Veiller au maintien de la présence en classe.");
-
-            if (actions.length === 0) return "L'élève présente d'excellents résultats et une assiduité exemplaire.";
-            return "<ul style='padding-left:20px;'>" + actions.map(a => `<li style='margin-bottom:6px;'>${a}</li>`).join('') + "</ul>";
-        }
-
-        function calculateRisk(average, absences) {
-            let points = 0;
-            if (average < 8) points += 3;
-            else if (average >= 8 && average < 10) points += 2;
-            else if (average >= 10 && average < 12) points += 1;
+        async function rechercherEnfant() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const bulletinZone = document.getElementById('bulletin-zone');
+            const warningBox = document.getElementById('parent-ia-warning');
             
-            if (absences >= 8) points += 3;
-            else if (absences >= 4 && absences <= 7) points += 2;
-            else if (absences >= 2 && absences <= 3) points += 1;
+            if (!query) return alert("Veuillez saisir un nom ou prénom !");
 
-            if (points >= 4) return { text: "Risque élevé", color: "rgba(255, 118, 117, 0.35)" };
-            if (points >= 2 && points <= 3) return { text: "À surveiller", color: "rgba(255, 234, 167, 0.25)" };
-            return { text: "Stable", color: "rgba(85, 239, 196, 0.25)" };
+            try {
+                const res = await fetch(`${API_URL}/eleves`);
+                const eleves = await res.json();
+
+                const enfant = eleves.find(e => 
+                    e.prenom.toLowerCase().includes(query) || 
+                    e.nom.toLowerCase().includes(query)
+                );
+
+                if (!enfant) {
+                    bulletinZone.style.display = "none";
+                    return alert("Élève non trouvé.");
+                }
+
+                // Charger le score de risque IA en temps réel
+                const resScore = await fetch(`${API_URL}/eleves/${enfant.id}/score`);
+                const scoreData = await resScore.json();
+
+                // Afficher le message d'alerte s'il y a un risque détecté par l'IA
+                if (scoreData.niveau_risque !== "stable") {
+                    warningBox.innerHTML = `🚨 **Notification IA Prévention :** Des fragilités académiques ont été détectées. Prenez contact avec l'équipe pédagogique pour mettre en œuvre un accompagnement à la maison.`;
+                    warningBox.style.display = "block";
+                } else {
+                    warningBox.style.display = "none";
+                }
+
+                // Charger les notes
+                const resNotes = await fetch(`${API_URL}/eleves/${enfant.id}/notes`);
+                const notes = await resNotes.json();
+
+                document.getElementById('enfant-nom').innerText = `🏆 ${enfant.prenom} ${enfant.nom}`;
+                document.getElementById('enfant-classe').innerText = `📍 Classe ID : ${enfant.classe_id}`;
+
+                const tbody = document.getElementById('notes-table-body');
+                tbody.innerHTML = "";
+
+                if (notes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Aucune note enregistrée.</td></tr>`;
+                    document.getElementById('enfant-moyenne').innerText = "Moyenne Générale : --";
+                } else {
+                    let somme = 0;
+                    notes.forEach(n => {
+                        somme += n.valeur;
+                        let matiereNom = n.matiere_id === 1 ? "Mathématiques" : "Français";
+                        tbody.innerHTML += `<tr><td><strong>${matiereNom}</strong></td><td>${n.valeur} / 20</td><td>${n.date_evaluation}</td></tr>`;
+                    });
+                    document.getElementById('enfant-moyenne').innerText = `Moyenne Générale : ${(somme / notes.length).toFixed(2)} / 20`;
+                }
+
+                bulletinZone.style.display = "block";
+            } catch (err) { console.error(err); }
         }
-
-        function loadParentView() {
-            const selectId = document.getElementById('select-student').value;
-            const card = document.getElementById('parent-report-card');
-            if(!selectId) { card.style.display = "none"; return; }
-
-            const student = students.find(s => s.id == selectId);
-            if(student) {
-                card.style.display = "block";
-                document.getElementById('display-name').innerText = `Fiche d'Évaluation : ${student.name} (${student.classroom})`;
-                document.getElementById('parent-avg').innerText = `${student.average} / 20`;
-                document.getElementById('parent-abs').innerText = `${student.absences} j`;
-                
-                const risk = calculateRisk(student.average, student.absences);
-                document.getElementById('parent-risk-status').innerText = risk.text;
-                document.getElementById('parent-risk-card').style.backgroundColor = risk.color;
-                document.getElementById('recommendation-content').innerHTML = generateRecommendations(student.average, student.absences);
-            }
-        }
-
-        initDropdown();
     </script>
-    <script>
-function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    localStorage.setItem('edutrack_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-}
-if (localStorage.getItem('edutrack_theme') === 'light') {
-    document.addEventListener('DOMContentLoaded', () => document.body.classList.add('light-mode'));
-}
-</script>
 </body>
 </html>
