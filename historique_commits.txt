@@ -1,0 +1,61 @@
+*   683f888 - elizahajatiana1-star, 14 minutes ago : Merge remote-tracking branch 'origin/feature/scoring' into dev
+|\  
+| * a1892b0 - hioti-soa, 69 minutes ago :  nouveau scoring apres test
+| * b59794d - hioti-soa, 72 minutes ago : effacer le scoring a cause du conflit
+| * e94870e - hioti-soa, 2 days ago : modification du fichier scoring
+| * 27931d1 - hioti-soa, 2 days ago :  scoring initial
+* |   90848b0 - elizahajatiana1-star, 15 minutes ago : Merge remote-tracking branch 'origin/feature/docs-tests' into dev
+|\ \  
+| * | 81ed065 - iriancaelle, 33 minutes ago : testeFinal
+| |/  
+* |   c34e51b - elizahajatiana1-star, 16 minutes ago : Merge remote-tracking branch 'origin/feature/frontend' into dev
+|\ \  
+| * | c3909fc - zavaanahy-spec, 39 minutes ago : le frontend correcte et propre
+| * | c5edd42 - zavaanahy-spec, 47 minutes ago : effacemet de tous les fichier a cause de conflits
+| * | 145e5f3 - zavaanahy-spec, 50 minutes ago : suppression des fichier unitil
+* | |   37eaf4b - elizahajatiana1-star, 16 minutes ago : Merge remote-tracking branch 'origin/feature/api' into dev
+|\ \ \  
+| * | | c8caf3c - tanya3131, 50 minutes ago : suppression et ajout de nouveau API
+* | | |   c93e0e9 - elizahajatiana1-star, 19 minutes ago : Merge branch 'feature/database' into dev
+|\ \ \ \  
+| * | | | 2c52b99 - elizahajatiana1-star, 22 minutes ago :  remplacement des fichier inutil et a des erreur
+| * | | |   214e086 - elizahajatiana1-star, 25 minutes ago : Merge branch 'main' of https://github.com/elizahajatiana1-star/EduTrack_Mada_AI into feature/database
+| |\ \ \ \  
+| * | | | | e9465ae - elizahajatiana1-star, 23 hours ago :  les supplement de code de database
+| * | | | | b6051b1 - elizahajatiana1-star, 2 days ago :  les fichiers : shema.sql , models.py , edutrack.db , requirements.txt
+| | |_|_|/  
+| |/| | |   
+* | | | |   86415c3 - elizahajatiana1-star, 19 hours ago : Merge remote-tracking branch 'remotes/origin/feature/api' into dev
+|\ \ \ \ \  
+| | |_|/ /  
+| |/| | |   
+| * | | | 9970bbd - tanya3131, 22 hours ago : API2
+| * | | |   5629c4b - tanya3131, 22 hours ago : Merge https://github.com/elizahajatiana1-star/EduTrack_Mada_AI into feature/api
+| |\ \ \ \  
+| * | | | | e306692 - tanya3131, 2 days ago : rest api init
+| | |/ / /  
+| |/| | |   
+* | | | |   e27d897 - elizahajatiana1-star, 19 hours ago : Merge https://github.com/elizahajatiana1-star/EduTrack_Mada_AI into origin/feature/frontend
+|\ \ \ \ \  
+| | |_|/ /  
+| |/| | /   
+| |_|_|/    
+|/| | |     
+| * | | 2999604 - iriancaelle, 22 hours ago : test d'integration
+| | |/  
+| |/|   
+| * | fddecee - zavaanahy-spec, 24 hours ago : Suppression des fichiers/dossiers inutiles
+| * |   83c6efa - zavaanahy-spec, 25 hours ago : Merge branch 'main' of https://github.com/elizahajatiana1-star/EduTrack_Mada_AI
+| |\ \  
+| | * | bfb1f82 - iriancaelle, 2 days ago : readme
+| | |/  
+| * / 4b9c6a5 - zavaanahy-spec, 25 hours ago :  premier commit
+|  /  
+* | b20ddab - zavaanahy-spec, 24 hours ago : Ajout frontend avec thème et pages inscription/login
+* | e609cd3 - zavaanahy-spec, 2 days ago :  nouveau index login
+* | 633a5c7 - zavaanahy-spec, 2 days ago :  frontend initial
+|/  
+*   8c5d7d6 - elizahajatiana1-star, 2 days ago : Merge branch 'main' of https://github.com/elizahajatiana1-star/EduTrack_Mada_AI
+|\  
+| * abe0c3e - elizahajatiana1-star, 2 days ago : Initial commit
+* 2b22b25 - elizahajatiana1-star, 2 days ago :  Structure initiale du projet
