@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Madagascar AI - Enseignants</title>
+    <style>
+        :root {
+            --bg-dark: #0f0c1b;
+            --primary-gradient: linear-gradient(135deg, #ff007f, #6c5ce7);
+            --text-light: #ffffff;
+            --text-muted: #a29bfe;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --risk-high: #ff7675;
+            --risk-watch: #ffeaa7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; }
+        header { background: rgba(15, 12, 27, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 100; }
+        .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+        .logo { font-size: 24px; font-weight: 800; }
+        .logo span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        nav a.active { color: var(--text-light); }
+        
+        main { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .dashboard-summary { display: flex; gap: 20px; margin-bottom: 30px; }
+        .kpi-card { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; }
+        .kpi-card h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+        .kpi-card .value { font-size: 28px; font-weight: bold; }
+        
+        .students-list { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid var(--card-border); }
+        th { color: var(--text-muted); }
+        
+        .badge-risk { background: rgba(255, 118, 117, 0.15); color: var(--risk-high); padding: 5px 10px; border-radius: 20px; font-weight: bold; }
+        .badge-watch { background: rgba(255, 234, 167, 0.15); color: var(--risk-watch); padding: 5px 10px; border-radius: 20px; font-weight: bold; }
+        .reco-box { font-size: 13px; color: #55efc4; background: rgba(85, 239, 196, 0.1); padding: 6px 10px; border-radius: 6px; margin-top: 5px; display: inline-block; border: 1px solid rgba(85, 239, 196, 0.2); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">EduTrack <span>Madagascar AI</span></div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Enseignants</a></li>
+                    <li><a href="parent.html">Parents</a></li>
+                    <li><a href="admin.html">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <h2>Tableau de bord IA Pédagogique</h2>
+        <div class="dashboard-summary">
+            <div class="kpi-card"><h3>Élèves Signalés</h3><div class="value" id="count-total">0</div></div>
+            <div class="kpi-card"><h3>Risque Élevé</h3><div class="value" id="count-high" style="color: var(--risk-high);">0</div></div>
+            <div class="kpi-card"><h3>À Surveiller</h3><div class="value" id="count-watch" style="color: var(--risk-watch);">0</div></div>
+        </div>
+        <section class="students-list">
+            <h3 style="margin-bottom: 20px;">🚨 Alertes Prédictives & Recommandations IA</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Élève</th>
+                        <th>Classe</th>
+                        <th>Score d'Alerte</th>
+                        <th>Statut IA</th>
+                        <th>Analyse & Recommandation Automatique</th>
+                    </tr>
+                </thead>
+                <tbody id="student-table-body"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        const API_URL = "http://127.0.0.1:8000/api";
+
+        // Générateur de recommandations pédagogiques basé sur les motifs de l'IA
+        function genererRecommandation(motif, prenom) {
+            if (motif.includes("Mathématiques")) {
+                return `💡 **Suggéré :** Planifier un tutorat d'urgence en algèbre/calcul pour ${prenom} et proposer des exercices complémentaires.`;
+            } else if (motif.includes("Français")) {
+                return `💡 **Suggéré :** Consolider la compréhension écrite et convoquer à un atelier de remédiation linguistique.`;
+            } else if (motif.includes("absences")) {
+                return `📞 **Action requise :** Contacter le parent d'élève immédiatement pour comprendre la cause du décrochage.`;
+            }
+            return `🎯 **Conseil :** Suivre l'évolution des évaluations lors de la prochaine session de devoirs.`;
+        }
+
+        async function chargerAlertes() {
+            try {
+                const resEleves = await fetch(`${API_URL}/eleves`);
+                const eleves = await resEleves.json();
+
+                // Rafraîchir les calculs de scores IA en arrière-plan
+                for (const e of eleves) { 
+                    try { await fetch(`${API_URL}/eleves/${e.id}/score`); } catch(err) {} 
+                }
+
+                const response = await fetch(`${API_URL}/alertes`);
+                const toutesAlertes = await response.json();
+                
+                const alertesUniques = [];
+                const vus = new Set();
+                for (let i = toutesAlertes.length - 1; i >= 0; i--) {
+                    if (!vus.has(toutesAlertes[i].eleve_id)) {
+                        vus.add(toutesAlertes[i].eleve_id);
+                        alertesUniques.unshift(toutesAlertes[i]);
+                    }
+                }
+
+                document.getElementById('count-total').innerText = alertesUniques.length;
+                document.getElementById('count-high').innerText = alertesUniques.filter(a => a.niveau_risque === 'risque_eleve').length;
+                document.getElementById('count-watch').innerText = alertesUniques.filter(a => a.niveau_risque === 'a_surveiller').length;
+
+                const tbody = document.getElementById('student-table-body');
+                tbody.innerHTML = "";
+
+                alertesUniques.forEach(alerte => {
+                    const eObj = eleves.find(x => x.id === alerte.eleve_id);
+                    if (!eObj) return;
+
+                    let nomComplet = `${eObj.prenom} ${eObj.nom}`;
+                    let badge = alerte.niveau_risque === 'risque_eleve' ? '<span class="badge-risk">Risque Élevé</span>' : '<span class="badge-watch">À Surveiller</span>';
+                    let recommandation = genererRecommandation(alerte.motif, eObj.prenom);
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${nomComplet}</strong></td>
+                            <td>Classe ${eObj.classe_id}</td>
+                            <td>${alerte.score} / 6</td>
+                            <td>${badge}</td>
+                            <td>
+                                <div style="color: #ff7675; font-size:14px; font-weight:500;">⚠️ ${alerte.motif}</div>
+                                <div class="reco-box">${recommandation}</div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) { console.error(err); }
+        }
+        document.addEventListener('DOMContentLoaded', chargerAlertes);
+    </script>
+</body>
+</html>
